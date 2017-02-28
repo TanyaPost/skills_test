@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<head>
+ <meta charset="utf-8" />
+ <style>
+  .table{
+    border-collapse: collapse;
+    margin: 0 0 20px;
+  }
+  .table td, .table th{
+    border: 1px solid gray;
+    padding: 20px;
+  }
+  td input:focus{
+    outline: 1px solid blue;
+  }
+
+  ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul li{
+    margin: 0 0 10px;
+  }
+ </style>
+</head>
+<body>
+  <table id="table" class="table">
+    <thead>
+        <tr>
+            <th>Aritst</th>
+            <th>Concert Place</th>
+            <th>Performance Records</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<p>* Click the cell that contains the data that you want to edit</p>
+<form action="" id="add_aritst" method="post" onsubmit="addRow();return false;">
+    <ul>
+        <li>
+            <label for="aritst">Aritst</label>
+            <input type="text" name="aritst" id="aritst" value="" size="12" tabindex="1" />
+        </li>
+        <li>
+            <label for="place">Concert Place</label>
+            <input type="text" name="place" id="place" value="" size="12" tabindex="2" />
+        </li>
+        <li>
+            <label for="records">Performance Records</label>
+            <input type="text" name="records" id="records" value="" size="12" tabindex="3" />
+        </li>
+        <li>
+            <input type="submit" name="subm" class="submit" value="Add" tabindex="4" />
+        </li>
+	</ul>
+</form>
+</body>
+<script>
+var d = document;
+var aritst;
+var place;
+var records;
+
+function addRow(){
+  aritst = d.getElementById('aritst').value;
+  place = d.getElementById('place').value;
+  records = d.getElementById('records').value;
+
+  var tbody = d.getElementById('table').getElementsByTagName('TBODY')[0];
+  var row = d.createElement("TR");
+  tbody.appendChild(row);
+
+  var td1 = d.createElement("TD");
+  var td2 = d.createElement("TD");
+  var td3 = d.createElement("TD");
+  var td4 = d.createElement("TD");
+
+  row.appendChild(td1);
+  row.appendChild(td2);
+  row.appendChild(td3);
+  row.appendChild(td4);
+
+  td1.innerHTML = aritst;
+  td2.innerHTML = place;
+  td3.innerHTML = records;
+  td4.innerHTML ='<input name="delete" type="button" value="Delete" onclick="delRow(this)">'
+};
+
+function delRow(r){
+  var i=r.parentNode.parentNode.rowIndex;
+  document.getElementById('table').deleteRow(i);
+};
+
+var table = document.getElementById('table');
+var editingTd;
+table.onclick = function(event) {
+  var target = event.target;
+
+  while (target != table) {
+    if (target.className == 'edit-cancel') {
+      finishTdEdit(editingTd.elem, false);
+      return;
+    }
+
+    if (target.className == 'edit-ok') {
+      finishTdEdit(editingTd.elem, true);
+      return;
+    }
+
+    if (target.nodeName == 'TD') {
+      if (editingTd) return;
+
+      edit(target);
+      return;
+    }
+
+    target = target.parentNode;
+  }
+}
+
+function edit(td) {
+  editingTd = {
+    elem: td,
+    data: td.innerHTML
+  };
+
+  td.classList.add('edit-td'); //
+
+  var inputNew = document.createElement('input');
+  inputNew.className = 'edit-area';
+
+  inputNew.value = td.innerHTML;
+  td.innerHTML = '';
+  td.appendChild(inputNew);
+  inputNew.focus();
+
+  td.insertAdjacentHTML("beforeEnd",
+    '<button class="edit-ok">save</button><button class="edit-cancel">X</button>'
+  );
+}
+
+function finishTdEdit(td, isOk) {
+  if (isOk) {
+    td.innerHTML = td.firstChild.value;
+  } else {
+    td.innerHTML = editingTd.data;
+  }
+  td.classList.remove('edit-td');
+  editingTd = null;
+}
+</script>
